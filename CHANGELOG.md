@@ -3,6 +3,7 @@
 | Version | Summary |
 |---------|---------|
 | Unreleased | |
+| 0.37.0 | Scripts repo files renamed with .sh; macOS page links follow; runner retired |
 | 0.36.0 | AC45: bashrc files to the scripts repo, private folder scrubbed, path detector |
 | 0.35.0 | AC44: hosted scripts retired; five pages point to gkit and the scripts repo |
 | 0.34.0 | AC43: About names the five entry kinds; pre-prep.sh excluded from the site |
