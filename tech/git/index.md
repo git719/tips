@@ -197,76 +197,21 @@ curl -u USERNAME:TOKEN https://api.github.com/orgs/:ORGNAME/repos?type=private
 
 To show current git branch in BASH PS1 prompt, do the following: 
 
-1. Create this `~/.fast-git-prompt.sh` script: 
-
-```bash
-# Copyright (c) 2019 Will Bender. All rights reserved.
-
-# This work is licensed under the terms of the MIT license.
-# For a copy, see <https://opensource.org/licenses/MIT>.
-
-# Very fast __git_ps1 implementation
-# Inspired by https://gist.github.com/wolever/6525437
-# Mainly this is useful for Windows users stuck on msys, cygwin, or slower wsl 1.0 because git/fs operations are just slower
-# Caching can be added by using export but PROMPT_COMMAND is necessary since $() is a subshell and cannot modify parent state.
-# Linux: time __ps1_ps1 (~7ms)
-# Windows msys2: time __git_ps1 (~100ms)
-# Windows msys2: time git rev-parse --abbrev-ref HEAD 2> /dev/null (~86ms)
-# Windows msys2: time __fastgit_ps1 (~1-3ms)
-
-# Simple PS1 without colors using format arg. Feel free to use PROMPT_COMMAND
-export PS1="\u@\h \w \$(__fastgit_ps1 '[%s] ')$ "
-
-# 100% pure Bash (no forking) function to determine the name of the current git branch
-function __fastgit_ps1 () {
-    local headfile head branch
-    local dir="$PWD"
-
-    while [ -n "$dir" ]; do
-        if [ -e "$dir/.git/HEAD" ]; then
-            headfile="$dir/.git/HEAD"
-            break
-        fi
-        dir="${dir%/*}"
-    done
-
-    if [ -e "$headfile" ]; then
-        read -r head < "$headfile" || return
-        case "$head" in
-            ref:*) branch="${head##*/}" ;;
-            "") branch="" ;;
-            *) branch="${head:0:7}" ;;  #Detached head. You can change the format for this too.
-        esac
-    fi
-
-    if [ -z "$branch" ]; then
-        return 0
-    fi
-
-    if [ -z "$1" ]; then
-        # Default format
-        printf "(%s) " "$branch"
-    else
-        # Use passed format string
-        printf "$1" "$branch"
-    fi
-}
-```
+1. Download [gitbranch.sh](https://github.com/queone/scripts/blob/main/gitbranch.sh) from the scripts repo and save it as `~/.gitbranch.sh`: `curl -o ~/.gitbranch.sh https://raw.githubusercontent.com/queone/scripts/main/gitbranch.sh`
 
 2. Then add below section somewhere in your `~/.bashrc` file: 
 
 ```bash
-export Grn='\[\e[1;32m\]' Blu='\[\e[1;34m\]'  Rst='\[\e[0m\]' # Color green, blue & reset
-# ~/.fast-git-prompt.sh = https://gist.github.com/Ragnoroct/c4c3bf37913afb9469d8fc8cffea5b2f
-if [[ -f ~/.fast-git-prompt.sh ]]; then
-    source ~/.fast-git-prompt.sh
-    export PS1="${Grn}[\h \W]${Rst} \$(__fastgit_ps1 '(${Blu}%s${Rst}) ')$ "
+export Grn='\[\e[1;32m\]' Blu='\[\e[1;34m\]' Rst='\[\e[0m\]' # Color green, blue & reset
+if [[ -f ~/.gitbranch.sh ]]; then
+    source ~/.gitbranch.sh
+    export PS1="${Grn}[\h \W]${Rst} \$(git_branch '(${Blu}%s${Rst}) ')$ "
 else
     export PS1="${Grn}[\h \W]${Rst}$ "
 fi
 ```
 
-The script above has been slightly reformated from [the original Github Gist](https://gist.github.com/Ragnoroct/c4c3bf37913afb9469d8fc8cffea5b2f).
+The script is based on [this GitHub Gist](https://gist.github.com/Ragnoroct/c4c3bf37913afb9469d8fc8cffea5b2f).
 
 
 ### Host Static Site on Github Repo

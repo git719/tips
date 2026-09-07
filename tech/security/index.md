@@ -168,22 +168,7 @@ To check entropy of these passwords use GRC's Interactive Brute Force Password "
 
 
 ### OpenSSL Commands
-- Functions to list SAN SSL certs and expiry. Use in `.bashrc` or put in a dedicated bash script: 
-
-```bash
-certls() {
-  [[ -z $1 ]] && echo "Usage: certls example.com:443" && return
-  # NEED -CApath /usr/local/etc/openssl/cert.pem for MACOS
-  echo -n | openssl s_client -CApath /usr/local/etc/openssl/cert.pem -connect $1 2>/dev/null | \
-  openssl x509 -noout -text | grep DNS: | tr ',' '\n' | awk '{print $1}' | sed 's;DNS:;;'
-}
-
-certexp() {
-  [[ -z $1 ]] && echo "Usage: certls example.com:443" && return
-  echo -n | openssl s_client -connect $1 2>/dev/null | openssl x509 -noout -dates | tr '\n' ' '
-  echo
-}
-```
+- To list a host's certificate names (SAN) and validity dates, install [Go](../go.md), then run `go install github.com/queone/gkit/cmd/certls@latest` and use [certls](https://github.com/queone/gkit/tree/main/cmd/certls): `certls example.com:443`
 
 **Commands:** 
 
@@ -228,43 +213,8 @@ echo -n | openssl s_client -connect puppet.mydomain.com:8140 -prexit
 ```
 
 
-### Generate Self-Signed Cert Bash Script
-This script should be placed in a code repo and just referenced here as an example 
-
-```bash
-#!/bin/bash
-# gencert
-# Generate a standard 10 year self-signed SSL cert. Also creates a CSR that can
-# be used to purchase a proper cert from CAs such as Entrust, Verisign, etc.
-
-FQDN=$1
-[[ -z "$FQDN" ]] && printf "Usage: $0 <common-name>\n" && exit 0
-
-# Required company cert info
-COUNTRY="US"
-STATE="NY"
-LOC="New York"
-ORG="My Org"
-UNIT="My Unit"
-printf "\nCOUNTRY=$COUNTY   STATE=$STATE   LOC=$LOC   ORG=$ORG   UNIT=$UNIT   DOMAIN=${FQDN}\n\n"
-
-MSG="Proceed to create 1) a private key, 2) a 10-year self-signed cert, and 3) a CSR for domain '$FQDN'? Y/N "
-read -p "$MSG" -n 1 && [[ ! $REPLY =~ ^[Yy]$ ]] && printf "\nAborted.\n" && exit 1
-
-printf "\nGenerating private key, self-signed cert, and CSR ...\n\n"
-
-openssl req -nodes -newkey rsa:2048 -keyout ${FQDN}.key -out ${FQDN}.csr -subj \
-"/C=${COUNTRY}/ST=${STATE}/L=${LOC}/O=${ORG}/OU=${UNIT}/CN=${FQDN}"
-
-openssl x509 -req -days 3650 -in ${FQDN}.csr -signkey ${FQDN}.key -out ${FQDN}.crt
-
-printf "\n1) Now you can use below self-signed cert + private key,\n2) Or use below CSR to \
-acquire a cert from a proper CA like Entrust, Verisign\n\n"
-
-printf "\n${FQDN}.crt\n${FQDN}.key\n${FQDN}.csr\n\n"
-
-exit 0
-```
+### Generate Self-Signed Cert
+To create a private key, a certificate signing request (CSR), and a 10-year self-signed certificate for a common name, use gkit [certgen](https://github.com/queone/gkit/tree/main/cmd/certgen): `certgen www.example.com`. It writes `www.example.com.key`, `www.example.com.csr`, and `www.example.com.crt`.
 
 
 ### Hashicorp Vault

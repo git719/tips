@@ -279,125 +279,13 @@ Two very rough examples of using **docker compose**:
      export MAZ_CLIENT_SECRET="client-secret-string"
      ```
 
+  - Get the two files from the scripts repo and keep them in one directory, for example a clone of that repo:
+    - [aztoken_compose.yaml](https://github.com/queone/scripts/blob/main/aztoken_compose.yaml): the compose file
+    - [aztoken.py](https://github.com/queone/scripts/blob/main/aztoken.py): the script, which gets a fresh token every 5 seconds and prints its details
   - Then you can build and run for the first time, or run subsequent times.
-      - `docker compose up --build`: To build and run for the first time.
-      - `docker compose up`: To run subsequent times.
-    - You can edit `aztoken.py` file to play with different behavior, like using a different scope and so on.
-  - The `docker-compose.yaml` files:
-
-     ```bash
-     # docker-compose.yaml
-
-     version: '3'
-     services:
-       python_app:
-         image: python:3.10-slim  # On Debian GNU/Linux 12 (bookworm)
-         command: bash -c '
-           cat /etc/os-release &&
-           pip install msal &&
-           python /app/aztoken.py'
-         volumes:
-           - ./:/app
-         environment:
-           - MAZ_CLIENT_ID=${MAZ_CLIENT_ID}
-           - MAZ_CLIENT_SECRET=${MAZ_CLIENT_SECRET}
-           - MAZ_TENANT_ID=${MAZ_TENANT_ID}
-         working_dir: /app
-
-     # BUILD & RUN: docker compose up --build
-     # JUST RUN   : docker compose up
-     # INSPECT    : docker compose run --build python_app bash
-     ```
-
-  - The `aztoken.py` script:
-
-     ```python
-     # aztoken.py
-
-     import sys
-     import time
-     import os
-     import json
-     from datetime import datetime, timedelta
-     import signal
-     import msal
-
-     BLUE = '\x1b[1;34m'
-     GREEN = '\x1b[32m'
-     RED = '\x1b[31m'
-     RESET = '\x1b[0m'
-
-     cache = msal.TokenCache()   # Initialize a global token cache
-
-     # Quick exit on CTRL-C
-     def exit_gracefully(signal, frame):
-         sys.exit(0)
-     signal.signal(signal.SIGTERM, exit_gracefully)
-     signal.signal(signal.SIGINT, exit_gracefully)
-
-     def print_flush(message):
-         print(message)
-         sys.stdout.flush()
-
-     def expiry_date(expires_in_seconds):
-         current_time = datetime.now()
-         if expires_in_seconds == None:
-             expires_in_seconds = 0
-         expiry_date_temp = current_time + timedelta(seconds=expires_in_seconds)
-         return expiry_date_temp.strftime('%Y-%m-%d %H:%M:%S')
-
-     def get_token_by_credentials(scopes, client_id, client_secret, authority_url):
-         # Define the client application using MSAL
-         cca = msal.ConfidentialClientApplication(
-             client_id,
-             authority=authority_url,
-             client_credential=client_secret,
-             token_cache=cache  # Use the global cache
-         )
-
-         # Acquire a token using client credentials
-         token_request = {
-             'scopes': scopes
-         }
-
-         try:
-             result = cca.acquire_token_for_client(scopes=scopes)
-             return result
-         except Exception as error:
-             raise Exception(f"Error acquiring token: {str(error)}")
-
-     def main():
-         # scopes = ['https://graph.microsoft.com/.default']
-         # scopes = ['https://management.azure.com/.default']
-         scopes = ['https://ossrdbms-aad.database.windows.net/.default']
-         client_id = os.environ.get('MAZ_CLIENT_ID')
-         client_secret = os.environ.get('MAZ_CLIENT_SECRET')
-         tenant_id = os.environ.get('MAZ_TENANT_ID')
-         authority_url = f'https://login.microsoftonline.com/{tenant_id}'
-
-         while True:
-             token = get_token_by_credentials(scopes, client_id, client_secret, authority_url)
-             if 'access_token' not in token:
-                 print_flush(f"{RED}Failed to obtain token: {token}{RESET}")
-             #print(json.dumps(token, indent=2))  # OPTION: Print entire token structure
-
-             access_token = token.get('access_token')
-             expires_in_secs = token.get('expires_in')
-             expires_in = expiry_date(expires_in_secs)
-
-             print_flush(f"\n{BLUE}TOKEN DETAILS{RESET}:")
-             print_flush(f"{BLUE}  client_id{RESET} : {GREEN}{client_id}{RESET}")
-             print_flush(f"{BLUE}  Authority{RESET} : {GREEN}{authority_url}{RESET}")
-             print_flush(f"{BLUE}  Scopes{RESET}    : {GREEN}{scopes}{RESET}")
-             print_flush(f"{BLUE}  Token{RESET}     : {GREEN}{access_token}{RESET}")
-             print_flush(f"{BLUE}  Expires On{RESET}: {GREEN}{expires_in}{RESET} ({expires_in_secs} seconds)")
-
-             # Wait for 5 seconds (5,000 milliseconds) before making the next call
-             time.sleep(5)
-
-     if __name__ == "__main__":
-         main()
-     ```
+      - `docker compose -f aztoken_compose.yaml up --build`: To build and run for the first time.
+      - `docker compose -f aztoken_compose.yaml up`: To run subsequent times.
+    - Edit your copy of `aztoken.py` to play with different behavior, like using a different scope and so on.
 
 ### Docker Images
 
@@ -405,7 +293,7 @@ To build a very small, almost empty container Docker image, build using `FROM sc
 
 ```bash
 $ vi hello.sh
-#!/bin/bashd
+#!/bin/bash
 echo Hello
 $ chmod 755 hello.sh
 $ vi Dockerfile

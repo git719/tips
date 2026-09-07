@@ -13,13 +13,17 @@ macOS bits.
 sudo scutil --set HostName <new_name>
 sudo scutil --set LocalHostName <new_name>
 sudo scutil --set ComputerName <new_name>
-dscacheutil -flushcache`
+dscacheutil -flushcache
 ```
 
 - Install Homebrew as per <https://brew.sh/>
 
 - Install the usual suspects using `brew`
-    - `brew install iterm2 coreutils fd jq git vscodium duckduckgo imagemagick appcleaner ffmpeg dos2unix pwgen nmap iperf3 gnutls python go tree`
+    - `brew install iterm2 coreutils fd jq git vscodium duckduckgo imagemagick appcleaner ffmpeg pwgen nmap iperf3 gnutls python go`
+
+- Install every [gkit](https://github.com/queone/gkit) utility, once Go is in from the brew list above or from the [Go](go.md) page
+    - `go install github.com/queone/gkit/cmd/...@latest`
+    - Binaries land in `$GOPATH/bin`, which the `.bashrc` below puts on `PATH`
 
 - iTerm2
     - Use the saved preferences under `~/<private>/etc/term/`
@@ -30,7 +34,7 @@ dscacheutil -flushcache`
 
 - Switch to BASH: `chsh -s /bin/bash`
 
-- Update screencapture behaviour: `./tools/macos/screencapture`
+- Update screen capture behaviour with [mac_screencap](https://github.com/queone/scripts/blob/main/mac_screencap) from the scripts repo
 
 
 ### BASHRC
