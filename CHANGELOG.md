@@ -3,6 +3,7 @@
 | Version | Summary |
 |---------|---------|
 | Unreleased | |
+| 0.36.0 | AC45: bashrc files to the scripts repo, private folder scrubbed, path detector |
 | 0.35.0 | AC44: hosted scripts retired; five pages point to gkit and the scripts repo |
 | 0.34.0 | AC43: About names the five entry kinds; pre-prep.sh excluded from the site |
 | 0.33.1 | AC42: register stale-owner warning, pre-prep.sh, HRW and GRC allowlisted |

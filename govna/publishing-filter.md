@@ -34,6 +34,7 @@ Note: a `take` is opinion on a subject, a `note` is an explainer, a `howto` is s
 - Publish no device identifier: serial number, hardware UUID, MAC address, or USB device ID.
 - Publish no employer name, employer domain, internal hostname, job name, or internal URL.
 - Publish no private network detail beyond generic RFC1918 examples.
+- Publish no home-folder layout: no path to a non-default folder under `~` or `$HOME`, and no iCloud Drive path.
 - Publish no personal health, family, or location detail.
 - Replace each removed value with a placeholder in the site's `<NAME>` or `mydomain.com` style, inside a code span or fence.
 - Keep an exact year that narrows the author's age out of first-person sentences; use a decade instead.
@@ -155,6 +156,8 @@ Note: the allowlist covers hosts that reject scripted requests: Stack Overflow a
 - Treat a warning as a review prompt, not a failure.
 
 Detector codes. Privacy: `P-GUID`, `P-SSH`, `P-HEX`, `P-MAC`, `P-EMAIL`, `P-PATH`, `P-ORG`, `P-DENY`. Warnings: `W-YEAR`, `W-PERSONAL`, `W-NAME`, `W-PLAIN`, `W-ANCHOR`, `W-STALE`, and the informational `W-DENY`, `W-TYPE`, `W-EXT`. Budgets: `B-TYPE`, `B-WORDS`, `B-FENCE`. Links: `L-REL`, `L-ANCHOR`, `L-ABS`, `L-EXT`. Structure: `X-MARKER`, `X-HEADING`, `X-LANG`, `X-QA`, `X-FENCE`. Index: `I-INDEX`. Register: `R-PATH`. Privacy and link checks run on every checked file. Budget, fence, marker, heading, and index checks run only on entries and the root site pages. The plain-English warning measures mean words per sentence over prose lines, with front matter, fences, block quotes, headings, table rows, link targets, and code spans removed, and with initials and common abbreviations not counted as sentence ends. The name warning skips the product names in its allow-list. The Spanish check fires on a line with four distinct Spanish words or a sentence with three. The question-form check also flags a paragraph that is nothing but a question. The anchor warning skips a fragment that starts with `/` or `!`, which is a client-side route. A fetch with no answer at all is retried once before it counts as dead. The stale-owner warning takes the first five letters of each word of five letters or more in a register row, minus common function words, and fires when fewer than half of them start a word in the owning entries. `CHANGELOG.md` is exempt from `P-ORG` because its historical rows are immutable.
+
+`P-PATH` covers an absolute home directory path, a home-folder layout (a non-default folder under `~` or `$HOME`), and an iCloud Drive path. Apple's default folders and `bin` are allowed.
 
 ## Self-Enhancement
 

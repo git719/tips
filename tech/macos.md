@@ -26,11 +26,11 @@ dscacheutil -flushcache
     - Binaries land in `$GOPATH/bin`, which the `.bashrc` below puts on `PATH`
 
 - iTerm2
-    - Use the saved preferences under `~/<private>/etc/term/`
+    - Use the saved preferences from your private settings folder
 
 - VSCodium
-    - On SRC: `cd && tar czf <private>/codium.tar.gz --exclude='*.sock' Library/Application\ Support/VSCodium`
-    - On DST: `cd && tar xzf <private>/codium.tar.gz`
+    - On SRC: `cd && tar czf codium.tar.gz --exclude='*.sock' Library/Application\ Support/VSCodium`, then keep the archive in your private settings folder
+    - On DST: `cd && tar xzf codium.tar.gz`
 
 - Switch to BASH: `chsh -s /bin/bash`
 
@@ -38,53 +38,14 @@ dscacheutil -flushcache
 
 
 ### BASHRC
-- `.bashrc` for a user: 
+Both files live in the scripts repo: [bashrc_user](https://github.com/queone/scripts/blob/main/bashrc_user) for a user account and [bashrc_root](https://github.com/queone/scripts/blob/main/bashrc_root) for root.
 
 ```bash
-echo "history -c" > ~/.bash_logout
-on_exit() { rm ~/.bash_history && sh ~/.bash_logout ; }
-trap on_exit EXIT
-
-export GOPATH=~/.go
-export PATH=$PATH:/usr/local/bin:$GOPATH/bin:$GOROOT/bin
-export HISTCONTROL=ignoreboth  # Ignore both duplicates and space-prefixed commands
-export HISTIGNORE='ls:cd:ll:h' # Ignore these commands
-export EDITOR=vi
-export Grn='\e[1;32m' Rst='\e[0m' # Green color and reset
-export PS1="\[$Grn\]\u@\h:\W\[$Rst\]$ "
-alias ls='gls -N --color -h --group-directories-first'
-alias ll='ls -ltr'
-alias h='history'
-alias vi='vim'
-export GREP_COLOR='1;36' # Cyan
-alias grep='grep --color'
-alias myip="ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p'"
-alias pwgen='pwgen -s1 14 6'
-alias code='/Applications/VSCodium.app/Contents/Resources/app/bin/codium'
-export BASH_SILENCE_DEPRECATION_WARNING=1
-export HOMEBREW_NO_ANALYTICS=1    # Disable homebrew Google Analytics collection
+curl -o ~/.bashrc https://raw.githubusercontent.com/queone/scripts/main/bashrc_user
+sudo curl -o /var/root/.bashrc https://raw.githubusercontent.com/queone/scripts/main/bashrc_root
 ```
-- `.bashrc` for root: 
 
-```bash
-echo "history -c" > ~/.bash_logout
-on_exit() { rm ~/.bash_history && sh ~/.bash_logout ; }
-trap on_exit EXIT
-
-export BASH_SILENCE_DEPRECATION_WARNING=1
-export HISTCONTROL=ignoreboth
-export HISTIGNORE='ls:cd:ll:h'
-export EDITOR=vi
-export Red='\e[1;31m' Rst='\e[0m' # Red color and reset
-export PS1="\[$Red\]\u@\h:\W\[$Rst\]$ "
-alias ls='gls -N --color -h --group-directories-first'
-alias ll='ls -ltr'
-alias h='history'
-alias vi='vim'
-export GREP_COLOR='1;36' # Cyan
-alias grep='grep --color'
-alias myip="ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p'"
-```
+The user file shows the current git branch in the prompt when `~/.gitbranch.sh` is installed, as described under [Show Branch in Shell Prompt](git/index.md#show-branch-in-shell-prompt). It ends by sourcing `~/.bashrc.local` when that file exists. Private settings such as tokens, tenant IDs, and account aliases go through that file and never enter a repo.
 
 ### Network Quality
 Check network quality => `networkQuality -v`

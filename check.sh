@@ -39,8 +39,8 @@ HEX_OK='sha256|shasum|sha512|md5sum|\.(iso|gz|tgz|zip|tar|dmg|img|xz|7z|pem|crt)
 MAC_RE='\b([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}\b|\b0800[0-9A-F]{8}\b'
 EMAIL_RE='[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}'
 EMAIL_OK='@(example\.(com|org|net)|mydomain\.com|somewhere\.com|contoso\.com|users\.noreply\.github\.com|github\.com|tty[0-9])|YOUR-[A-Z-]*@'
-PATH_RE='/(Users|home)/[A-Za-z0-9._-]+'
-PATH_OK='/(Users|home)/(myuser|myusername|someuser|user1|USERNAME|username|pi|linuxbrew|roms|test|<)'
+PATH_RE='/(Users|home)/[A-Za-z0-9._-]+|(~|\$HOME|\$\{HOME\}|\$\(HOME\))/[A-Za-z0-9][A-Za-z0-9._-]*|Mobile Documents|CloudDocs'
+PATH_OK='/(Users|home)/(myuser|myusername|someuser|user1|USERNAME|username|pi|linuxbrew|roms|test|<)|(~|\$HOME|\$\{HOME\}|\$\(HOME\))/(Applications|Desktop|Documents|Downloads|Library|Movies|Music|Pictures|Public|bin)$'
 ORG_RE='(github\.com|githubusercontent\.com)/kquo/'
 FP_RE="\\b(I|my|me|myself|I'm|I've|I'd)\\b"
 YEAR_RE='\b(19[0-9]{2}|20[0-9]{2})\b'
@@ -128,7 +128,7 @@ check_privacy() {
   rg -n -e "$HEX_RE" "$f" | rg -v -e "$HEX_OK" | cut -d: -f1 | while read -r l; do emit "$f" "$l" P-HEX "long hex string"; done
   rg -n -e "$MAC_RE" "$f" | cut -d: -f1 | while read -r l; do emit "$f" "$l" P-MAC "MAC address"; done
   rg -n -e "$EMAIL_RE" "$f" | rg -v -e "$EMAIL_OK" | cut -d: -f1 | while read -r l; do emit "$f" "$l" P-EMAIL "email address outside placeholder domains"; done
-  rg -n -e "$PATH_RE" "$f" | rg -v -e "$PATH_OK" | cut -d: -f1 | while read -r l; do emit "$f" "$l" P-PATH "home directory path"; done
+  rg -n -o -e "$PATH_RE" "$f" | rg -v -e "$PATH_OK" | cut -d: -f1 | sort -n -u | while read -r l; do emit "$f" "$l" P-PATH "home directory path, home-folder layout, or iCloud Drive path"; done
   if [ "$f" != CHANGELOG.md ]; then
     rg -n -e "$ORG_RE" "$f" | cut -d: -f1 | while read -r l; do emit "$f" "$l" P-ORG "reference to the retired kquo org"; done
   fi
@@ -337,6 +337,8 @@ selftest() {
     printf 'mac 08:00:27:AE:2F:12 and 080027AE2F12\n'
     printf 'mail someone@realcompany.com\n'
     printf 'path /%s/realname/code\n' Users
+    printf 'home ~/vault/notes\n'
+    printf 'drive Library/Mobile Documents/com~apple~CloudDocs/x\n'
     printf 'org https://github.com/kquo/thing\n'
     printf 'the SecretWord appears\n'
     printf 'I first read it in 1992 and my wife agreed.\n'
@@ -369,7 +371,7 @@ SHIM
   printf '## Life\n\n- [Dirty](dirty.md)\n' >"$fx/life/index.md"
   printf '## Sub\n' >"$fx/life/sub/index.md"
   printf '# Register\n\n| # | Position | Owning entry | Status |\n|---|---|---|---|\n| 1 | X. | `life/missing.md` | settled |\n| 2 | Y. | `life/dirty.md` | bogus |\n| 3 | Markets reward innovation through price signals. | `life/dirty.md` | settled |\n' >"$fx/govna/stance-register.md"
-  printf -- '---\ntype: note\n---\n## Clean\n\nA clean [entry](index.md) with one [ref](https://en.wikipedia.org/wiki/Main_Page).\n\nMicrosoft Graph accepts the token.\n' >"$clean/life/clean.md"
+  printf -- '---\ntype: note\n---\n## Clean\n\nA clean [entry](index.md) with one [ref](https://en.wikipedia.org/wiki/Main_Page).\n\nMicrosoft Graph accepts the token. Photos sit in ~/Pictures/x and settings in ~/.config/x.\n' >"$clean/life/clean.md"
   printf '## Life\n\n- [Clean](clean.md)\n' >"$clean/life/index.md"
   printf '# Register\n\n| # | Position | Owning entry | Status |\n|---|---|---|---|\n| 1 | X. | `life/clean.md` | settled |\n' >"$clean/govna/stance-register.md"
 
@@ -380,6 +382,8 @@ SHIM
   if printf '%s\n' "$res" | rg -q -e "life/initials.md:1: W-PLAIN"; then printf 'PASS W-PLAIN-initials\n'; else printf 'FAIL W-PLAIN-initials\n'; ok=1; fi
   if printf '%s\n' "$res" | rg -q -e "life/spanish.md:[0-9]+: X-LANG"; then printf 'PASS X-LANG-sentence\n'; else printf 'FAIL X-LANG-sentence\n'; ok=1; fi
   if [ "$(printf '%s\n' "$res" | rg -c -e "life/qa.md:[0-9]+: X-QA")" -ge 3 ]; then printf 'PASS X-QA-paragraph\n'; else printf 'FAIL X-QA-paragraph\n'; ok=1; fi
+  if printf '%s\n' "$res" | rg -q -e "life/dirty.md:11: P-PATH"; then printf 'PASS P-PATH-home\n'; else printf 'FAIL P-PATH-home\n'; ok=1; fi
+  if printf '%s\n' "$res" | rg -q -e "life/dirty.md:12: P-PATH"; then printf 'PASS P-PATH-icloud\n'; else printf 'FAIL P-PATH-icloud\n'; ok=1; fi
   res=$( (COUNTFILE="$TMP/count" PATH="$TMP/bin:$PATH" CHECK_ROOT="$fx" "$SELF" life/retry.md) 2>&1 )
   if [ "$(cat "$TMP/count")" = 3 ] && ! printf '%s\n' "$res" | rg -q -e "W-EXT|L-EXT"; then printf 'PASS RETRY-429\n'; else printf 'FAIL RETRY-429\n'; ok=1; fi
   res=$( (COUNTFILE="$TMP/count0" SHIM_MODE=000 PATH="$TMP/bin:$PATH" CHECK_ROOT="$fx" "$SELF" life/retry.md) 2>&1 )

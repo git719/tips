@@ -218,7 +218,7 @@ GOOS=windows GOARCH=amd64 go build -ldflags "-s -w" -o build/windows/awsinfo.exe
 
 # Modify below target to where you keep your binaries
 install:
-cp build/macos/awsinfo $(HOME)/<private>/bin
+cp build/macos/awsinfo $(HOME)/bin
 clean:
 rm -rf build
 ```

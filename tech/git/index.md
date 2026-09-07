@@ -42,7 +42,7 @@ git diff branch_A branch_B                   # Compare two branches
 git config user.email <email>
 git clone git@github.com:Org/MyRepo.git      # Clone via SSH
 git clone https://github.com/Org/MyRepo.git  # Clone via HTTPS
-git clone /path/to/trix.git trix      # Clone bare local repo (in iCloud, etc)
+git clone /path/to/trix.git trix             # Clone bare local repo (on a cloud drive, etc)
 
 git pull                                     # Pick up recent changes from master
 git add .                                    # Update local repo with all recent changes (b4 committing)
@@ -148,9 +148,9 @@ git init
 git add .
 git commit -m "First commit"
 # Create local origin directory (preferably a cloud drive) and PUSH to it
-mkdir -p ~/<private>/tech/gitrepos/myproject.git
-git init --bare ~/<private>/tech/gitrepos/myproject.git
-git remote set-url origin ~/<private>/tech/gitrepos/myproject.git
+mkdir -p <cloud-drive>/gitrepos/myproject.git
+git init --bare <cloud-drive>/gitrepos/myproject.git
+git remote set-url origin <cloud-drive>/gitrepos/myproject.git
 git remote -v   # To confirm where origin is
 git push
 # OR create GitHub remote origin and PUSH to it
