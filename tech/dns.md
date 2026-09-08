@@ -91,9 +91,9 @@ Remove-DnsServerResourceRecord -ComputerName ns1.mydomain.com -ZoneName "mydomai
 ```
 
 ### PowerShell DNS Scripts
-Four PowerShell scripts verify, create, delete, and upsert A and PTR records in zones hosted on Active Directory DNS servers. Each reads a `FQDN,IP` CSV file and needs DNS admin rights. They live in the scripts repo:
+Four PowerShell scripts verify, create, delete, and upsert A and PTR records in zones hosted on Active Directory DNS servers. Each reads a `FQDN,IP` CSV file and needs DNS admin rights. They live in the gkit scripts folder:
 
-- [dns_chk.ps1](https://github.com/queone/scripts/blob/main/dns_chk.ps1): verify that each A and PTR record matches the file
-- [dns_add.ps1](https://github.com/queone/scripts/blob/main/dns_add.ps1): create the A and PTR records
-- [dns_del.ps1](https://github.com/queone/scripts/blob/main/dns_del.ps1): delete the A record and any PTR records
-- [dns_upsert.ps1](https://github.com/queone/scripts/blob/main/dns_upsert.ps1): delete then recreate the records
+- [dns_chk.ps1](https://github.com/queone/gkit/blob/main/scripts/dns_chk.ps1): verify that each A and PTR record matches the file
+- [dns_add.ps1](https://github.com/queone/gkit/blob/main/scripts/dns_add.ps1): create the A and PTR records
+- [dns_del.ps1](https://github.com/queone/gkit/blob/main/scripts/dns_del.ps1): delete the A record and any PTR records
+- [dns_upsert.ps1](https://github.com/queone/gkit/blob/main/scripts/dns_upsert.ps1): delete then recreate the records

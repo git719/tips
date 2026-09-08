@@ -11,28 +11,19 @@ Useful GoLang bits.
 
 ### Install Go
 
-1. On macOS 
+Run the install script from the gkit scripts folder. On a Mac with Homebrew it installs or upgrades Go through `brew`. Asking for a specific version, or passing `-a`, uses the official archive instead, which is what happens on Linux and Windows/GitBASH anyway.
 
 ```bash
-brew install go
+curl -kLo /tmp/install-go.sh https://github.com/queone/gkit/raw/main/scripts/install_go.sh
+bash /tmp/install-go.sh            # Install or upgrade to the latest Go ... or
+bash /tmp/install-go.sh go1.23.3   # Install this specific version from the archive
+bash /tmp/install-go.sh -n         # Dry run: print the plan only
 
-# Then update essential system variables 
-export GOPATH=~/.go  # Create this dir if nece
-export PATH=$PATH:$GOPATH/bin 
-```
+# Root/sudo privilege needed in order to install the archive under `/usr/local/`
 
-2. On Linux and Windows/GitBASH 
-
-```bash
-curl -kLo /tmp/install-go.sh https://raw.githubusercontent.com/queone/scripts/main/install_go
-bash /tmp/install-go.sh            # To install latest Go version ... or 
-bash /tmp/install-go.sh go1.23.3   # To install this specific Go version
-
-# Root/sudo privilege needed in order to install under `/usr/local/`
-
-# Then update essential system variables 
-export GOROOT=/usr/local/go
-export GOPATH=~/.go  # Create this dir if nece
+# Then update essential system variables (Homebrew manages GOROOT on a Mac)
+export GOROOT=/usr/local/go       # Archive installs only
+export GOPATH=~/.go               # Create this dir if necessary
 export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
 ```
 

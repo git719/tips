@@ -141,7 +141,8 @@ Note: the allowlist covers hosts that reject scripted requests: Stack Overflow a
 ## Code Hosting
 
 - Host no executable code on the site.
-- Keep every script in the `queone/scripts` repository and link to it.
+- Keep every script under `scripts/` in the `queone/gkit` repository and link to it.
+- Write download commands as `curl -L` against `https://github.com/queone/gkit/raw/main/scripts/<file>`.
 - Keep a fenced block on a `take`, `note`, `howto`, or `quote` entry to 40 lines or fewer.
 - Tag every fenced block with a language, or `text` for plain output.
 - Show a snippet inline only when reading it is the point of the entry.
@@ -158,6 +159,8 @@ Note: the allowlist covers hosts that reject scripted requests: Stack Overflow a
 Detector codes. Privacy: `P-GUID`, `P-SSH`, `P-HEX`, `P-MAC`, `P-EMAIL`, `P-PATH`, `P-ORG`, `P-DENY`. Warnings: `W-YEAR`, `W-PERSONAL`, `W-NAME`, `W-PLAIN`, `W-ANCHOR`, `W-STALE`, and the informational `W-DENY`, `W-TYPE`, `W-EXT`. Budgets: `B-TYPE`, `B-WORDS`, `B-FENCE`. Links: `L-REL`, `L-ANCHOR`, `L-ABS`, `L-EXT`. Structure: `X-MARKER`, `X-HEADING`, `X-LANG`, `X-QA`, `X-FENCE`. Index: `I-INDEX`. Register: `R-PATH`. Privacy and link checks run on every checked file. Budget, fence, marker, heading, and index checks run only on entries and the root site pages. The plain-English warning measures mean words per sentence over prose lines, with front matter, fences, block quotes, headings, table rows, link targets, and code spans removed, and with initials and common abbreviations not counted as sentence ends. The name warning skips the product names in its allow-list. The Spanish check fires on a line with four distinct Spanish words or a sentence with three. The question-form check also flags a paragraph that is nothing but a question. The anchor warning skips a fragment that starts with `/` or `!`, which is a client-side route. A fetch with no answer at all is retried once before it counts as dead. The stale-owner warning takes the first five letters of each word of five letters or more in a register row, minus common function words, and fires when fewer than half of them start a word in the owning entries. `CHANGELOG.md` is exempt from `P-ORG` because its historical rows are immutable.
 
 `P-PATH` covers an absolute home directory path, a home-folder layout (a non-default folder under `~` or `$HOME`), and an iCloud Drive path. Apple's default folders and `bin` are allowed.
+
+`L-EXT` also covers bare `github.com/queone` and `raw.githubusercontent.com/queone` URLs inside fenced blocks and code spans, so download commands are checked too. The `github.com/<owner>/<repo>/raw/` redirect form is not reported as moved.
 
 ## Self-Enhancement
 

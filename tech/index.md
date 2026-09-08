@@ -16,6 +16,6 @@
 - [macOS](macos.md): Migration, shell setup, networking, image conversion, and hardware info.
 - [PDF](pdf.md): Shrinking and merging PDFs from the command line.
 - [Privacy](privacy.md): Online basics, why we surveil, and where it becomes overreach.
-- [Scripts](https://github.com/queone/scripts): The shell scripts, hosted in their own repository.
+- [Scripts](https://github.com/queone/gkit/tree/main/scripts): Standalone shell, PowerShell, and Python scripts, kept in the gkit repository.
 - [Security](security/index.md): Passwords, certificates, SSH keys, pfSense, OpenSSL, and Vault.
 - [Terraform](terraform/index.md): Modules, state moves, workflow, Azure, and GitHub Actions, plus two essays on IaC and state.

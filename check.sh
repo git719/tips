@@ -190,6 +190,7 @@ check_external() { # file line url
   esac
   case "$u" in *\#*) check_anchor "$f" "$l" "$u" ;; esac
   printf '%s' "$u" | rg -q -e "://([^/]*\.)?($HOST_SHORT)" && return 0
+  printf '%s' "$u" | rg -q -e 'github\.com/[^/]+/[^/]+/raw/' && return 0
   if [ "$(norm_url "$u")" != "$(norm_url "$final")" ]; then emit "$f" "$l" L-EXT "moved to $final"; fi
 }
 
@@ -197,12 +198,13 @@ check_links() {
   local f="$1" d line l t p a target src="$TMP/links.src"
   d=$(dirname "$f")
   linksrc "$f" >"$src"
+  : >"$TMP/links.seen"
   { rg -n -o -e '\]\(((?:[^()]|\([^()]*\))+)\)' -r '$1' "$src"; rg -n -o -e 'href="([^"]+)"' -r '$1' "$src"; rg -n -o -e '<(https?://[^>]+)>' -r '$1' "$src"; } 2>/dev/null \
   | sort -u | sort -t: -k1,1n | while IFS= read -r line; do
     l="${line%%:*}"; t="${line#*:}"
     t="${t%% *}"
     case "$t" in
-      http://* | https://*) check_external "$f" "$l" "$t" ;;
+      http://* | https://*) printf '%s:%s\n' "$l" "$t" >>"$TMP/links.seen"; check_external "$f" "$l" "$t" ;;
       mailto:* | tel:* | \{\{*) ;;
       \#*) a="${t#\#}"; slugs_of "$f" | rg -q -x -F "$a" || emit "$f" "$l" L-ANCHOR "no heading for #$a in this page" ;;
       *)
@@ -215,6 +217,12 @@ check_links() {
           slugs_of "$target" | rg -q -x -F "$a" || emit "$f" "$l" L-ANCHOR "no heading for #$a in $p"
         fi ;;
     esac
+  done
+  rg -n -o -e 'https?://(github\.com|raw\.githubusercontent\.com)/queone/[^[:space:]`"'"'"')>]+' "$f" 2>/dev/null \
+    | sort -u | sort -t: -k1,1n | while IFS= read -r line; do
+    rg -q -x -F -- "$line" "$TMP/links.seen" 2>/dev/null && continue
+    l="${line%%:*}"; t="${line#*:}"
+    check_external "$f" "$l" "$t"
   done
 }
 
@@ -347,7 +355,7 @@ selftest() {
     printf 'No hay nada más viral que la enfermedad del pesimismo, y esto tiene que ver con la mente.\n'
     printf -- '- How does it work?\nQ: is this a transcript?\n'
     printf 'Winston Churchill said this without a source.\n'
-    printf '```\n'; c=0; while [ $c -lt 45 ]; do printf 'line %s\n' "$c"; c=$((c+1)); done; printf '```\n'
+    printf '```\n'; printf 'curl -L https://github.com/queone/no-such-repo/raw/main/x.sh\n'; c=0; while [ $c -lt 45 ]; do printf 'line %s\n' "$c"; c=$((c+1)); done; printf '```\n'
     c=0; while [ $c -lt 300 ]; do printf 'word '; c=$((c+1)); done; printf '\n'
   } >"$fx/life/dirty.md"
   printf '## Untyped\n\nShort.\n' >"$fx/life/untyped.md"
@@ -384,6 +392,7 @@ SHIM
   if [ "$(printf '%s\n' "$res" | rg -c -e "life/qa.md:[0-9]+: X-QA")" -ge 3 ]; then printf 'PASS X-QA-paragraph\n'; else printf 'FAIL X-QA-paragraph\n'; ok=1; fi
   if printf '%s\n' "$res" | rg -q -e "life/dirty.md:11: P-PATH"; then printf 'PASS P-PATH-home\n'; else printf 'FAIL P-PATH-home\n'; ok=1; fi
   if printf '%s\n' "$res" | rg -q -e "life/dirty.md:12: P-PATH"; then printf 'PASS P-PATH-icloud\n'; else printf 'FAIL P-PATH-icloud\n'; ok=1; fi
+  if printf '%s\n' "$res" | rg -q -e "life/dirty.md:[0-9]+: L-EXT dead \(404\): https://github.com/queone/no-such-repo"; then printf 'PASS L-EXT-fenced\n'; else printf 'FAIL L-EXT-fenced\n'; ok=1; fi
   res=$( (COUNTFILE="$TMP/count" PATH="$TMP/bin:$PATH" CHECK_ROOT="$fx" "$SELF" life/retry.md) 2>&1 )
   if [ "$(cat "$TMP/count")" = 3 ] && ! printf '%s\n' "$res" | rg -q -e "W-EXT|L-EXT"; then printf 'PASS RETRY-429\n'; else printf 'FAIL RETRY-429\n'; ok=1; fi
   res=$( (COUNTFILE="$TMP/count0" SHIM_MODE=000 PATH="$TMP/bin:$PATH" CHECK_ROOT="$fx" "$SELF" life/retry.md) 2>&1 )

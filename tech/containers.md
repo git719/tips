@@ -279,9 +279,9 @@ Two very rough examples of using **docker compose**:
      export MAZ_CLIENT_SECRET="client-secret-string"
      ```
 
-  - Get the two files from the scripts repo and keep them in one directory, for example a clone of that repo:
-    - [aztoken_compose.yaml](https://github.com/queone/scripts/blob/main/aztoken_compose.yaml): the compose file
-    - [aztoken.py](https://github.com/queone/scripts/blob/main/aztoken.py): the script, which gets a fresh token every 5 seconds and prints its details
+  - Get the two files from the gkit scripts folder and keep them in one directory, for example a clone of that repo:
+    - [aztoken_compose.yaml](https://github.com/queone/gkit/blob/main/scripts/aztoken_compose.yaml): the compose file
+    - [aztoken.py](https://github.com/queone/gkit/blob/main/scripts/aztoken.py): the script, which gets a fresh token every 5 seconds and prints its details
   - Then you can build and run for the first time, or run subsequent times.
       - `docker compose -f aztoken_compose.yaml up --build`: To build and run for the first time.
       - `docker compose -f aztoken_compose.yaml up`: To run subsequent times.

@@ -34,15 +34,15 @@ dscacheutil -flushcache
 
 - Switch to BASH: `chsh -s /bin/bash`
 
-- Update screen capture behaviour with [mac_screencap.sh](https://github.com/queone/scripts/blob/main/mac_screencap.sh) from the scripts repo
+- Update screen capture behaviour with [mac_screencap.sh](https://github.com/queone/gkit/blob/main/scripts/mac_screencap.sh) from the gkit scripts folder
 
 
 ### BASHRC
-Both files live in the scripts repo: [bashrc_user.sh](https://github.com/queone/scripts/blob/main/bashrc_user.sh) for a user account and [bashrc_root.sh](https://github.com/queone/scripts/blob/main/bashrc_root.sh) for root.
+Both files live in the gkit scripts folder: [bashrc_user.sh](https://github.com/queone/gkit/blob/main/scripts/bashrc_user.sh) for a user account and [bashrc_root.sh](https://github.com/queone/gkit/blob/main/scripts/bashrc_root.sh) for root.
 
 ```bash
-curl -o ~/.bashrc https://raw.githubusercontent.com/queone/scripts/main/bashrc_user.sh
-sudo curl -o /var/root/.bashrc https://raw.githubusercontent.com/queone/scripts/main/bashrc_root.sh
+curl -Lo ~/.bashrc https://github.com/queone/gkit/raw/main/scripts/bashrc_user.sh
+sudo curl -Lo /var/root/.bashrc https://github.com/queone/gkit/raw/main/scripts/bashrc_root.sh
 ```
 
 The user file shows the current git branch in the prompt when `~/.gitbranch.sh` is installed, as described under [Show Branch in Shell Prompt](git/index.md#show-branch-in-shell-prompt). It ends by sourcing `~/.bashrc.local` when that file exists. Private settings such as tokens, tenant IDs, and account aliases go through that file and never enter a repo.

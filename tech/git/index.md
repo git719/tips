@@ -197,7 +197,7 @@ curl -u USERNAME:TOKEN https://api.github.com/orgs/:ORGNAME/repos?type=private
 
 To show current git branch in BASH PS1 prompt, do the following: 
 
-1. Download [gitbranch.sh](https://github.com/queone/scripts/blob/main/gitbranch.sh) from the scripts repo and save it as `~/.gitbranch.sh`: `curl -o ~/.gitbranch.sh https://raw.githubusercontent.com/queone/scripts/main/gitbranch.sh`
+1. Download [gitbranch.sh](https://github.com/queone/gkit/blob/main/scripts/gitbranch.sh) from the gkit scripts folder and save it as `~/.gitbranch.sh`: `curl -Lo ~/.gitbranch.sh https://github.com/queone/gkit/raw/main/scripts/gitbranch.sh`
 
 2. Then add below section somewhere in your `~/.bashrc` file: 
 
