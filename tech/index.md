@@ -13,6 +13,7 @@
 - [git](git/index.md): Everyday git, branch cleanup, rebasing, squashing, OIDC to Azure and Vault, and GitHub App permissions.
 - [Go](go.md): Install, local module overrides, build fixes, and snippets.
 - [iCloud Photos](icloud-photos.md): Exporting, backing up, and restoring a Photos library.
+- [Internet Archive](internet-archive.md): Account, keys, the ia command line, and what a login does and does not unlock.
 - [macOS](macos.md): Migration, shell setup, networking, image conversion, and hardware info.
 - [PDF](pdf.md): Shrinking and merging PDFs from the command line.
 - [Privacy](privacy.md): Online basics, why we surveil, and where it becomes overreach.

@@ -68,7 +68,18 @@ OIDC allows workflows to authenticate and interact with Azure using short-lived 
                 echo "AZ_TOKEN=$AZ_TOKEN" >> $GITHUB_ENV
                 curl -sH "Content-Type: application/json" -H "Authorization: Bearer ${AZ_TOKEN}" -X GET "https://management.azure.com/subscriptions?api-version=2022-12-01" | jq
 
-            # Option 2: Using custom Python script (RECOMMENDED)
+            # Option 2: Using the oidctok binary (RECOMMENDED)
+            - name: install_oidctok
+              run: go install github.com/queone/gkit/cmd/oidctok@latest
+
+            # Appends AZ_TOKEN and MG_TOKEN to GITHUB_ENV, so every later step sees them
+            - name: get_azure_tokens
+              run: oidctok
+              env:
+                CLIENT_ID: ${{secrets.CLIENT_ID}}
+                TENANT_ID: ${{secrets.TENANT_ID}}
+
+            # Option 3: Using the Python script
             # See https://github.com/queone/gkit/blob/main/scripts/get_oidc_tokens.py
 
             - name: some_other_step
@@ -131,7 +142,8 @@ MS Graph                    │                         Azure ARM
 ```
 
 ### References
-- [Example Python Get OIDC Token Script](https://github.com/queone/gkit/blob/main/scripts/get_oidc_tokens.py)
+- [oidctok README](https://github.com/queone/gkit/blob/main/cmd/oidctok/README.md)
+- [Python option: get_oidc_tokens.py](https://github.com/queone/gkit/blob/main/scripts/get_oidc_tokens.py)
 - [What is Github Action for Azure](https://learn.microsoft.com/en-us/azure/developer/github/github-actions) 
 - [Configuring OpenID Connect in Azure](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-azure)
 - [Azure login action](https://github.com/marketplace/actions/azure-login)

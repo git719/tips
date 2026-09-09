@@ -52,6 +52,9 @@ URL_SKIP='mydomain\.com|example\.(com|org|net)|somewhere\.com|contoso\.com|169\.
 HOST_ALLOW='stackoverflow\.com|stackexchange\.com|medium\.com|congress\.gov|sagepub\.com|politico\.com|devgenius\.io|hrw\.org|grc\.com'
 HOST_SHORT='youtu\.be|youtube\.com|a\.co|aka\.ms|bit\.ly|t\.co|amazon\.com'
 FENCE_MAX=40
+ZOMBIE_RE='(tion|sion|ment|ance|ence|ity|ness)s?$'
+ZOMBIE_OK='institution institutions question questions evidence position positions consciousness attention sentence sentences intelligence decision decisions security reflexivity information education audience audiences reference references identity identities community communities business businesses argument arguments responsibility responsibilities humanity environment environments condition conditions compassion coalition coalitions consequence consequences curiosity science sciences conscience experience experiences difference differences existence essence silence violence presence absence independence confidence influence influences sequence sequences tradition traditions religion religions opinion opinions emotion emotions nation nations generation generations population populations society societies reality realities quality qualities ability abilities possibility possibilities opportunity opportunities authority authorities majority minority minorities university universities activity activities priority priorities moment moments element elements government governments treatment treatments agreement agreements department departments parliament happiness darkness kindness illness illnesses weakness weaknesses madness sadness fairness goodness richness loneliness witness witnesses wilderness fitness'
+ZOMBIE_MAX=50
 QA_RE='^[[:space:]]*([0-9]+\.|[-*+])[[:space:]]+(\*\*)?(?i:how|what|why|where|when|which|who|is|are|can|do|does|should)\b.*\?[[:space:]]*$|^[[:space:]]*(\*\*)?(Q|A|Question|Answer)(\*\*)?:|^[[:space:]]*\*\*(Q|A|Question|Answer)\*\*[[:space:]]|^[[:space:]]*(Q|A)[.)-][[:space:]]'
 ES_RE='el|los|las|una|está|están|también|porque|más|cómo|qué|años|desde|hasta|cuando|tiene|tienen|hacer|sobre|entre|muy|pero|ser|ese|esa|esto|nosotros|ellos|siempre|nunca|mundo|vida|gente|cosas|mejor|ahora|todo|todos|nada|puede|pueden|mismo|cada|donde|aquí|que|por|si|hacia|abajo|arriba|después|antes|solo|sólo|algo|alguien|nadie|otra|otro|otros|otras|nuestro|nuestra|sino|aunque|mientras|entonces|así|aún|hoy|mañana|bien|pequeño|primero|último|hombre|mujer|tiempo|cosa|hecho|tener|decir|dice|dijo|fue|eran|fueron|estar|somos|soy|eres|vamos|voy|quiero|puedo|sabe|saber|vez|veces|día|días|noche|esta|este|estos|estas|aquel|aquella|quien|quién|dónde|cuál|cuánto'
 ES_SENT=3
@@ -114,6 +117,14 @@ plain_mean() { # file -> mean words per sentence over prose, in tenths
   prosesrc "$1" | awk '/^#/{next} /^\|/{next} /^[[:space:]]*$/{next} {print}' | sed -E 's/\]\([^)]*\)/]/g; s/`[^`]*`/x/g' | tr '\n' ' ' \
     | awk '{ n=split($0, tk, /[[:space:]]+/); out=""; for(i=1;i<=n;i++){ w=tk[i]; if (w ~ /^[A-Z]\.[,;:)]?$/ || w ~ /^(e\.g\.|i\.e\.|etc\.|vs\.|Dr\.|Mr\.|Mrs\.|Ms\.|Jr\.|Sr\.|St\.|No\.|U\.S\.|U\.K\.)[,;:)]?$/) gsub(/\./, "", w); out=out " " w }
              n=split(out, s, "[.!?]+([ \"\047)]+|$)"); w=0; c=0; for(i=1;i<=n;i++){ k=split(s[i], t, /[[:space:]]+/); m=0; for(j=1;j<=k;j++) if(t[j]!="") m++; if(m>0){w+=m; c++} } if(c==0) print 0; else printf "%d\n", (w*10)/c }'
+}
+
+zombie_rate() { # file -> "tenths word:count ..." nominalizations per 100 prose words, most frequent first
+  prosesrc "$1" | awk '/^#/{next} /^\|/{next} /^[[:space:]]*$/{next} {print}' | sed -E 's/\]\([^)]*\)/]/g; s/`[^`]*`/x/g' \
+    | awk -v re="$ZOMBIE_RE" -v oklist="$ZOMBIE_OK" 'BEGIN{ n=split(oklist, a, " "); for (i=1;i<=n;i++) ok[a[i]]=1 }
+        { n=split($0, t, "[^A-Za-z\047-]+"); for (i=1;i<=n;i++){ w=tolower(t[i]); if (w=="") continue; words++; if (length(w)>=8 && w ~ re && !(w in ok)) { z++; c[w]++ } } }
+        END{ print (words ? int(1000*z/words+0.5) : 0); for (w in c) print c[w], w }' \
+    | { IFS= read -r rate; printf '%s' "$rate"; sort -rn | awk '{printf " %s:%s", $2, $1}'; printf '\n'; }
 }
 
 budget_for() {
@@ -249,6 +260,8 @@ check_structure() {
   if [ "$kind" = entry ] && { [ "$t" = take ] || [ "$t" = note ]; }; then
     pm=$(plain_mean "$f")
     if [ "$pm" -gt 160 ]; then emit "$f" 1 W-PLAIN "mean $((pm / 10)).$((pm % 10)) words per sentence, keep a take or note near 16 or fewer"; fi
+    zr=$(zombie_rate "$f"); zt=${zr%% *}; zw=${zr#* }; [ "$zw" = "$zr" ] && zw=""
+    if [ "$zt" -gt "$ZOMBIE_MAX" ]; then emit "$f" 1 W-ZOMBIE "nominalizations at $((zt / 10)).$((zt % 10)) per 100 words, above $((ZOMBIE_MAX / 10)).$((ZOMBIE_MAX % 10)): $zw"; fi
   fi
   prosesrc "$f" >"$TMP/prose.src"
   rg -n -o -i -w -e "$ES_RE" "$TMP/prose.src" | tr '[:upper:]' '[:lower:]' | sort -u | cut -d: -f1 | uniq -c | awk -v m="$ES_MIN" '$1>=m{print $2}' | while read -r l; do emit "$f" "$l" X-LANG "Spanish prose, write the entry in English"; done
@@ -362,6 +375,7 @@ selftest() {
   printf -- '---\ntype: take\n---\n## Spanish\n\nI keep one line from a film here. Nunca encontrarás un arco iris si estás mirando hacia abajo. It still moves me.\n' >"$fx/life/spanish.md"
   printf -- '---\ntype: note\n---\n## QA\n\nHow do I decrypt a disc?\n\nUse the app.\n\n- how does it work?\n\n**Q** Is it safe?\n' >"$fx/life/qa.md"
   printf -- '---\ntype: take\n---\n## Anchor\n\nI link a [missing anchor](https://en.wikipedia.org/wiki/Main_Page#no-such-anchor).\n' >"$fx/life/anchor.md"
+  printf -- '---\ntype: note\n---\n## Zombie\n\nThe implementation of the utilization plan needs the consideration and determination of the organization, with documentation, evaluation, and verification of each modification and notification.\n' >"$fx/life/zombie.md"
   printf -- '---\ntype: take\n---\n## Retry\n\nI link a [slow host](https://retry.example.test/x).\n' >"$fx/life/retry.md"
   mkdir -p "$TMP/bin"
   cat >"$TMP/bin/curl" <<'SHIM'
@@ -383,8 +397,8 @@ SHIM
   printf '## Life\n\n- [Clean](clean.md)\n' >"$clean/life/index.md"
   printf '# Register\n\n| # | Position | Owning entry | Status |\n|---|---|---|---|\n| 1 | X. | `life/clean.md` | settled |\n' >"$clean/govna/stance-register.md"
 
-  res=$( (CHECK_ROOT="$fx" BITS_DENYLIST="$TMP/deny.txt" "$SELF" life/dirty.md life/untyped.md life/initials.md life/spanish.md life/qa.md life/anchor.md; CHECK_ROOT="$fx" "$SELF" --register) 2>&1 )
-  for c in P-GUID P-SSH P-HEX P-MAC P-EMAIL P-PATH P-ORG P-DENY W-YEAR W-PERSONAL B-TYPE B-WORDS B-FENCE L-REL L-ANCHOR L-ABS L-EXT X-MARKER X-HEADING X-LANG X-QA X-FENCE W-NAME W-PLAIN W-ANCHOR W-STALE I-INDEX R-PATH; do
+  res=$( (CHECK_ROOT="$fx" BITS_DENYLIST="$TMP/deny.txt" "$SELF" life/dirty.md life/untyped.md life/initials.md life/spanish.md life/qa.md life/anchor.md life/zombie.md; CHECK_ROOT="$fx" "$SELF" --register) 2>&1 )
+  for c in P-GUID P-SSH P-HEX P-MAC P-EMAIL P-PATH P-ORG P-DENY W-YEAR W-PERSONAL B-TYPE B-WORDS B-FENCE L-REL L-ANCHOR L-ABS L-EXT X-MARKER X-HEADING X-LANG X-QA X-FENCE W-NAME W-PLAIN W-ZOMBIE W-ANCHOR W-STALE I-INDEX R-PATH; do
     if printf '%s\n' "$res" | rg -q -e " $c "; then printf 'PASS %s\n' "$c"; else printf 'FAIL %s\n' "$c"; ok=1; fi
   done
   if printf '%s\n' "$res" | rg -q -e "life/initials.md:1: W-PLAIN"; then printf 'PASS W-PLAIN-initials\n'; else printf 'FAIL W-PLAIN-initials\n'; ok=1; fi

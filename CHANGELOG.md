@@ -3,6 +3,7 @@
 | Version | Summary |
 |---------|---------|
 | Unreleased | |
+| 0.40.0 | AC48+AC49+AC50: oidctok, Internet Archive how-to, zombie warning, Pinker link |
 | 0.39.0 | AC47: a note on The Sense of Style; five Pinker rules join the Voice section |
 | 0.38.0 | AC46: script links point at gkit scripts folder; fenced download URLs checked |
 | 0.37.0 | Scripts repo files renamed with .sh; macOS page links follow; runner retired |
