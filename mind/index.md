@@ -22,3 +22,4 @@
 - [Reflexivity](reflexivity.md): Observing and revising your own thinking, its evolved limits, and how institutions extend it.
 - [Reflexivity Curriculum](reflexivity-curriculum.md): Norms, practices, and safeguards that make reflection the default.
 - [Science](science.md): The most important mental tool we have, and why it comes hard.
+- [The Sense of Style](sense-of-style.md): What Pinker's book argues, which popular tips are his, and how to use it.

@@ -33,3 +33,4 @@ Use this table as the list of settled positions the site holds. One line per pos
 | 27 | Neither the universe nor anyone in it owes you anything; luck is partly built by the places, rooms, and habits you choose; pay for what lies outside your skill or time, more so with age. | `life/personal-growth.md` | settled |
 | 28 | Widening one's interests beyond the self is the answer to the fear of death. | `life/growing-old.md` | settled |
 | 29 | Before AGI the software worth building is domain-specific harnesses and small maintainable utilities that augment people and models toward aligned AGI, with human intuition steering exploration; a superintelligence would absorb the harness layer, and every such claim is provisional. | `tech/before-agi.md` | settled |
+| 30 | Classic style, prose as a window on something the reader can see, is this site's writing model, and the curse of knowledge is the main cause of unclear writing. | `mind/sense-of-style.md` | settled |

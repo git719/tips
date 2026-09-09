@@ -52,6 +52,11 @@ Note: the two blood-pressure pages stay. A generic health how-to is not personal
 - Write each reflective entry as how the author sees the subject, not as a report on it.
 - Write every `take` and `note` in plain English: short sentences and common words.
 - Keep a `take` or `note` near 16 words per sentence or fewer.
+- Show the reader the thing itself instead of announcing that you will discuss it.
+- Prefer a concrete noun and an active verb over an abstract noun made from a verb.
+- Define each term and spell out each abbreviation where it first appears.
+- Put a sentence's heaviest phrase at its end, not in its middle.
+- Open a sentence with what the reader already knows, then add the new point.
 - Write every sentence complete and grammatically correct.
 - Make each sentence follow from the one before it, so a paragraph reads as one line of thought in the author's voice.
 - Open with one grounding sentence in that same voice.
@@ -68,7 +73,7 @@ Note: the two blood-pressure pages stay. A generic health how-to is not personal
 - Publish no placeholder such as NEEDS REWRITE, need link, Need sources, Needs clean up, TODO, FIXME, or TBD.
 - Write a how-to as the shortest sequence of steps that reaches the result.
 
-Note: the banned headings are the fingerprint of an unedited machine draft. The text under them is usually the only part worth keeping. The question-form and Spanish-prose detectors in `check.sh` back the transcript and English rules.
+Note: the banned headings are the fingerprint of an unedited machine draft. The text under them is usually the only part worth keeping. The question-form and Spanish-prose detectors in `check.sh` back the transcript and English rules. The five sentence-level rules after the length rule follow The Sense of Style, and `mind/sense-of-style.md` explains them.
 
 ## Fairness And Corrections
 
